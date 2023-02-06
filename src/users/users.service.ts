@@ -8,19 +8,20 @@ import { v4 } from 'uuid';
 import { User } from './user.entity';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserDTO } from './dto/update-user.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 const USER_VERSION = 1;
 
 @Injectable()
 export class UsersService {
-  private users = [];
+  constructor(private database: DatabaseService) {}
 
   getAll() {
-    return this.users;
+    return this.database.users;
   }
 
   getById(id) {
-    const user = this.users.find((user) => user.id === id);
+    const user = this.database.users.find((user) => user.id === id);
     if (user) {
       return user;
     }
@@ -39,23 +40,23 @@ export class UsersService {
       currentDate,
     );
 
-    this.users.push(user);
+    this.database.users.push(user);
 
     return user;
   }
 
   update(id, userDTO: UpdateUserDTO) {
-    const index = this.users.findIndex((user) => user.id === id);
+    const index = this.database.users.findIndex((user) => user.id === id);
 
     if (index === -1) {
       throw new NotFoundException();
     }
 
-    if (userDTO.oldPassword !== this.users[index].password) {
+    if (userDTO.oldPassword !== this.database.users[index].password) {
       throw new ForbiddenException();
     }
 
-    const user = this.users[index];
+    const user = this.database.users[index];
 
     user.password = userDTO.newPassword;
     user.version = user.version + 1;
@@ -65,9 +66,9 @@ export class UsersService {
   }
 
   remove(id) {
-    const index = this.users.findIndex((user) => user.id === id);
+    const index = this.database.users.findIndex((user) => user.id === id);
     if (index !== -1) {
-      const [user] = this.users.splice(index, 1);
+      const [user] = this.database.users.splice(index, 1);
       return user;
     }
     throw new NotFoundException();
