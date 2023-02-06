@@ -5,4 +5,5 @@ export class DatabaseService {
   users = [];
   tracks = [];
   artists = [];
+  albums = [];
 }
