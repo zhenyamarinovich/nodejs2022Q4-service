@@ -51,11 +51,19 @@ export class AlbumsService {
   remove(id) {
     const index = this.database.albums.findIndex((album) => album.id === id);
 
-    if (index !== -1) {
-      const [album] = this.database.albums.splice(index, 1);
-
-      return album;
+    if (index === -1) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException();
+
+    const indexInFavorites = this.database.favorites.albums.indexOf(id);
+    if (indexInFavorites !== -1) {
+      this.database.favorites.albums.splice(indexInFavorites, 1);
+    }
+
+    this.database.tracks
+      .filter((track) => track.albumId === id)
+      .forEach((track) => (track.albumId = null));
+
+    this.database.albums.splice(index, 1);
   }
 }

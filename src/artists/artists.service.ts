@@ -4,7 +4,6 @@ import { v4 } from 'uuid';
 import { DatabaseService } from 'src/database/database.service';
 import { CreateArtistDTO } from './dto/create-artist.dto';
 import { UpdateArtistDTO } from './dto/update-artist.dto';
-import { TracksService } from 'src/tracks/tracks.service';
 
 @Injectable()
 export class ArtistsService {
@@ -52,23 +51,23 @@ export class ArtistsService {
   remove(id) {
     const index = this.database.artists.findIndex((artist) => artist.id === id);
 
-    if (index !== -1) {
-      const [artist] = this.database.artists.splice(index, 1);
-
-      this.database.tracks.forEach((track) => {
-        if (track.artistId === id) {
-          const editTrack = {
-            ...track,
-            artistId: null,
-          };
-          console.log(editTrack);
-          return editTrack;
-        }
-        return track;
-      });
-
-      return artist;
+    if (index === -1) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException();
+
+    const indexInFavorites = this.database.favorites.artists.indexOf(id);
+    if (index !== -1) {
+      this.database.favorites.artists.splice(indexInFavorites, 1);
+    }
+
+    this.database.tracks
+      .filter((track) => track.artistId === id)
+      .forEach((track) => (track.artistId = null));
+
+    this.database.albums
+      .filter((album) => album.artistId === id)
+      .forEach((album) => (album.artistId = null));
+
+    this.database.artists.splice(index, 1);
   }
 }

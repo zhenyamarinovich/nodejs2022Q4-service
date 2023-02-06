@@ -6,4 +6,9 @@ export class DatabaseService {
   tracks = [];
   artists = [];
   albums = [];
+  favorites = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
 }

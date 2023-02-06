@@ -67,10 +67,10 @@ export class UsersService {
 
   remove(id) {
     const index = this.database.users.findIndex((user) => user.id === id);
-    if (index !== -1) {
-      const [user] = this.database.users.splice(index, 1);
-      return user;
+    if (index === -1) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException();
+
+    this.database.users.splice(index, 1);
   }
 }

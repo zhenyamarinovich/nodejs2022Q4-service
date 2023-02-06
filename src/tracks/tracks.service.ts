@@ -24,8 +24,8 @@ export class TracksService {
 
   create(trackDTO: CreateTrackDTO) {
     const track = {
-      ...trackDTO,
       id: v4(),
+      ...trackDTO,
     };
 
     this.database.tracks.push(track);
@@ -40,21 +40,27 @@ export class TracksService {
       throw new NotFoundException();
     }
 
-    this.database.tracks[index] = {
-      ...this.database.tracks[index],
-      ...trackDTO,
-    };
+    const track = this.database.tracks[index];
 
-    return this.database.tracks[index];
+    track.name = trackDTO.name;
+    track.artistId = trackDTO.artistId;
+    track.albumId = trackDTO.albumId;
+    track.duration = trackDTO.duration;
+
+    return track;
   }
 
   remove(id) {
     const index = this.database.tracks.findIndex((track) => track.id === id);
 
-    if (index !== -1) {
-      const [track] = this.database.tracks.splice(index, 1);
-      return track;
+    if (index === -1) {
+      throw new NotFoundException();
     }
-    throw new NotFoundException();
+    const indexInFavorites = this.database.favorites.tracks.indexOf(id);
+    if (index !== -1) {
+      this.database.favorites.tracks.splice(indexInFavorites, 1);
+    }
+
+    this.database.tracks.splice(index, 1);
   }
 }
