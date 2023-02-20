@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { DataSource } from 'typeorm';
 
 import { UsersModule } from './users/users.module';
 import { TracksModule } from './tracks/tracks.module';
@@ -28,9 +29,14 @@ import { DatabaseModule } from './database/database.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       synchronize: true,
+      entities: ['dist/**/*.entity.js'],
+      migrations: ['dist/**/migration/*.js'],
+      migrationsRun: true,
     }),
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}

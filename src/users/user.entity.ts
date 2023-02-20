@@ -1,28 +1,38 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  VersionColumn,
+} from 'typeorm';
 
+@Entity()
 export class User {
-  id: string;
-  login: string;
-  version: number;
-  createdAt: number;
-  updatedAt: number;
+  @PrimaryGeneratedColumn('uuid')
+  readonly id: string;
+
+  @Column()
+  private login: string;
+
+  @VersionColumn()
+  private version: number;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  @Transform(({ value }) => value.getTime(), { toPlainOnly: true })
+  private createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp' })
+  @Transform(({ value }) => value.getTime(), { toPlainOnly: true })
+  private updatedAt: Date;
 
   @Exclude()
+  @Column()
   password: string;
 
-  constructor(
-    id: string,
-    login: string,
-    password: string,
-    version: number,
-    createdAt: number,
-    updatedAt: number,
-  ) {
-    this.id = id;
+  constructor(login: string, password: string) {
     this.login = login;
     this.password = password;
-    this.version = version;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
   }
 }
