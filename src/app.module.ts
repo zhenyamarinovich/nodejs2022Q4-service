@@ -1,36 +1,36 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ArtistsController } from './artists/artists.controller';
-import { AlbumsController } from './albums/albums.controller';
-import { TracksController } from './tracks/tracks.controller';
-import { FavoritesController } from './favorites/favorites.controller';
-import { UsersController } from './users/users.controller';
-import { UsersService } from './users/users.service';
-import { TracksService } from './tracks/tracks.service';
-import { AlbumsService } from './albums/albums.service';
-import { ArtistsService } from './artists/artists.service';
-import { FavoritesService } from './favorites/favorites.service';
-import { DatabaseService } from './database/database.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
+
+import { UsersModule } from './users/users.module';
+import { TracksModule } from './tracks/tracks.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { ArtistsModule } from './artists/artists.module';
+import { AlbumsModule } from './albums/albums.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [],
-  controllers: [
-    AppController,
-    ArtistsController,
-    AlbumsController,
-    TracksController,
-    FavoritesController,
-    UsersController,
+  imports: [
+    UsersModule,
+    TracksModule,
+    FavoritesModule,
+    ArtistsModule,
+    AlbumsModule,
+    DatabaseModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+      synchronize: true,
+    }),
   ],
-  providers: [
-    AppService,
-    UsersService,
-    TracksService,
-    AlbumsService,
-    ArtistsService,
-    FavoritesService,
-    DatabaseService,
-  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
