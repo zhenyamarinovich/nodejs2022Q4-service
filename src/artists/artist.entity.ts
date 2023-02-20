@@ -1,18 +1,13 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('artist')
 export class Artist {
   @PrimaryGeneratedColumn('uuid')
-  readonly id: string;
+  id: string;
 
-  @Column()
-  name: string;
-
-  @Column()
+  @Column({ name: 'grammy', type: 'boolean' })
   grammy: boolean;
 
-  constructor(name: string, grammy: boolean) {
-    this.name = name;
-    this.grammy = grammy;
-  }
+  @Column({ name: 'name', type: 'varchar' })
+  name: string;
 }

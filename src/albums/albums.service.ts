@@ -9,79 +9,60 @@ import { Repository } from 'typeorm';
 import { CreateAlbumDTO } from './dto/create-albums.dto';
 import { UpdateAlbumDTO } from './dto/update-albums.dto';
 import { Album } from './album.entity';
-import { ArtistsService } from 'src/artists/artists.service';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(Album)
     private readonly albumRepository: Repository<Album>,
-    private readonly artistsService: ArtistsService,
   ) {}
 
   async getAll(): Promise<Album[]> {
     return this.albumRepository.find();
   }
 
-  async getById(id, flag?) {
+  async getById(id) {
     const album = await this.albumRepository.findOneBy({ id });
-
-    if (album || flag) {
-      return album;
+    if (!album) {
+      throw new NotFoundException();
     }
-
-    throw new NotFoundException();
-  }
-
-  async getArtistFromDTO(id: string) {
-    if (id === null) {
-      return null;
-    }
-
-    const data = await this.artistsService.getById(id);
-
-    if (!data) {
-      throw new BadRequestException();
-    }
-
-    return data;
-  }
-
-  async create(albumDTO: CreateAlbumDTO) {
-    const artist = await this.getArtistFromDTO(albumDTO.artistId);
-
-    const album = new Album(albumDTO.name, albumDTO.year, artist);
-
-    await this.albumRepository.insert(album);
-
     return album;
   }
 
-  async update(id, albumDTO: UpdateAlbumDTO) {
-    const album = await this.albumRepository.findOneBy({ id });
+  async create(albumDTO: CreateAlbumDTO) {
+    try {
+      const newAlbum = this.albumRepository.create(albumDTO);
+      return await this.albumRepository.save(newAlbum);
+    } catch (error) {
+      throw new NotFoundException();
+    }
+  }
 
-    if (!album) {
+  async update(id, albumDTO: UpdateAlbumDTO) {
+    const entity = await this.albumRepository.findOneBy({ id });
+    if (!entity) {
       throw new NotFoundException();
     }
 
-    const artist = await this.getArtistFromDTO(albumDTO.artistId);
-
-    await this.albumRepository.update(id, {
-      id,
-      name: albumDTO.name,
-      year: albumDTO.year,
-      artist,
-    });
-
-    return await this.albumRepository.findOneBy({ id });
+    for (const key in albumDTO) {
+      if (Object.prototype.hasOwnProperty.call(albumDTO, key)) {
+        const element = albumDTO[key];
+        entity[key] = element;
+      }
+    }
+    try {
+      await this.albumRepository.update({ id }, albumDTO);
+    } catch (error) {
+      throw new NotFoundException();
+    }
+    return entity;
   }
 
   async remove(id) {
-    const album = await this.albumRepository.findOneBy({ id });
-    if (!album) {
+    const { affected } = await this.albumRepository.delete(id);
+    if (!affected) {
       throw new NotFoundException();
     }
-
-    await this.albumRepository.delete(id);
+    return;
   }
 }

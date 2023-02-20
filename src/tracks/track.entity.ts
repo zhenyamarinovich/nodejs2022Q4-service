@@ -1,39 +1,36 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Expose, Transform } from 'class-transformer';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 import { Artist } from 'src/artists/artist.entity';
 import { Album } from 'src/albums/album.entity';
 
-@Entity()
+@Entity('track')
 export class Track {
-  constructor(
-    name: string,
-    duration: number,
-    artist: Artist | null,
-    album: Album | null,
-  ) {
-    this.name = name;
-    this.duration = duration;
-    this.artist = artist;
-    this.album = album;
-  }
-
   @PrimaryGeneratedColumn('uuid')
-  readonly id: string;
+  id: string;
 
-  @Column()
+  @Column({ name: 'name', type: 'varchar' })
   name: string;
 
-  @Column()
+  @Column({ name: 'duration', type: 'int' })
   duration: number;
 
-  @ManyToOne(() => Artist, null, { onDelete: 'SET NULL', eager: true })
-  @Expose({ name: 'artistId' })
-  @Transform(({ value }) => (value ? value.id : null))
-  artist: Artist | null;
+  @Column({ name: 'artist_id', type: 'uuid', default: null })
+  artistId: string | null;
 
-  @ManyToOne(() => Album, null, { onDelete: 'SET NULL', eager: true })
-  @Expose({ name: 'albumId' })
-  @Transform(({ value }) => (value ? value.id : null))
-  album: Album | null;
+  @Column({ name: 'album_id', type: 'uuid', default: null })
+  albumId: string | null;
+
+  @ManyToOne(() => Artist, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'artist_id', referencedColumnName: 'id' })
+  artist: Artist;
+
+  @ManyToOne(() => Album, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'album_id', referencedColumnName: 'id' })
+  album: Album;
 }

@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { DataSource } from 'typeorm';
 
 import { UsersModule } from './users/users.module';
 import { TracksModule } from './tracks/tracks.module';
@@ -10,7 +9,6 @@ import { ArtistsModule } from './artists/artists.module';
 import { AlbumsModule } from './albums/albums.module';
 
 import { dataSourceOptions } from './ormconfig';
-import { DatabaseService } from './database/database.service';
 
 @Module({
   imports: [
@@ -24,9 +22,5 @@ import { DatabaseService } from './database/database.service';
     }),
     TypeOrmModule.forRoot(dataSourceOptions),
   ],
-  controllers: [],
-  providers: [DatabaseService],
 })
-export class AppModule {
-  constructor(private dataSource: DataSource) {}
-}
+export class AppModule {}

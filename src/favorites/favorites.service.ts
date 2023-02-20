@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   UnprocessableEntityException,
@@ -13,9 +12,6 @@ import {
 } from './favorites.entity';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { AlbumsService } from 'src/albums/albums.service';
-import { ArtistsService } from 'src/artists/artists.service';
-import { TracksService } from 'src/tracks/tracks.service';
 
 @Injectable()
 export class FavoritesService {
@@ -26,124 +22,78 @@ export class FavoritesService {
     private readonly albumRepository: Repository<FavotitesAlbum>,
     @InjectRepository(FavotitesTrack)
     private readonly trackRepository: Repository<FavotitesTrack>,
-
-    private readonly artistsService: ArtistsService,
-    private readonly albumsService: AlbumsService,
-    private readonly tracksService: TracksService,
   ) {}
 
   async getAll() {
-    return {
-      artists: await this.artistsService.getAll(),
-      albums: await this.albumsService.getAll(),
-      tracks: await this.tracksService.getAll(),
-    };
+    const albumRepositoryData = await this.albumRepository.find({
+      relations: ['album'],
+    });
+
+    const artistRepositoryData = await this.artistRepository.find({
+      relations: ['artist'],
+    });
+
+    const trackRepositoryData = await this.trackRepository.find({
+      relations: ['track'],
+    });
+
+    const albums = albumRepositoryData.map((elem) => elem.album);
+    const artists = artistRepositoryData.map((elem) => elem.artist);
+    const tracks = trackRepositoryData.map((elem) => elem.track);
+
+    return { albums, artists, tracks };
   }
 
-  async createTrack(id) {
-    const track = await this.tracksService.getById(id, true);
+  async createTrack(id: string) {
+    const track = await this.trackRepository.create({ trackId: id });
 
-    if (!track) {
+    console.log(track);
+    try {
+      return await this.trackRepository.save(track);
+    } catch (error) {
       throw new UnprocessableEntityException();
     }
-
-    const data = await this.trackRepository.findOneBy({ id });
-
-    if (data) {
-      throw new BadRequestException();
-    }
-
-    const favoritesData = new FavotitesTrack(track);
-    await this.trackRepository.create(favoritesData);
-    return data;
   }
 
   async createAlbum(id) {
-    const album = await this.albumsService.getById(id, true);
-
-    if (!album) {
+    const album = this.albumRepository.create({ albumId: id });
+    try {
+      return await this.albumRepository.save(album);
+    } catch (error) {
       throw new UnprocessableEntityException();
     }
-
-    const data = await this.albumRepository.findOneBy({ id });
-
-    if (data) {
-      throw new BadRequestException();
-    }
-
-    const favoritesData = new FavotitesAlbum(album);
-    await this.albumRepository.create(favoritesData);
-    return data;
   }
 
   async createArtist(id) {
-    const artist = await this.artistsService.getById(id, true);
-
-    if (!artist) {
+    const artist = this.artistRepository.create({ artistId: id });
+    try {
+      return await this.artistRepository.save(artist);
+    } catch (error) {
       throw new UnprocessableEntityException();
     }
-
-    const data = await this.artistRepository.findOneBy({ id });
-
-    if (data) {
-      throw new BadRequestException();
-    }
-
-    const favoritesData = new FavotitesArtist(artist);
-
-    await this.artistRepository.create(favoritesData);
-
-    return data;
   }
 
   async removeArtist(id: string) {
-    const artist = await this.artistsService.getById(id);
-
-    if (!artist) {
+    const { affected } = await this.artistRepository.delete({ artistId: id });
+    if (!affected) {
       throw new NotFoundException();
     }
-
-    const data = await this.artistRepository.findOneBy({ id });
-
-    if (!data) {
-      throw new NotFoundException();
-    }
-
-    await this.artistRepository.delete(data);
-    return data;
+    return;
   }
 
   async removeAlbum(id: string) {
-    const album = await this.albumsService.getById(id);
-
-    if (!album) {
+    const { affected } = await this.albumRepository.delete({ albumId: id });
+    if (!affected) {
       throw new NotFoundException();
     }
-
-    const data = await this.albumRepository.findOneBy({ id });
-
-    if (!data) {
-      throw new NotFoundException();
-    }
-
-    await this.albumRepository.delete(data);
-    return data;
+    return;
   }
 
   async removeTrack(id: string) {
-    const track = await this.tracksService.getById(id);
-
-    if (!track) {
+    const { affected } = await this.trackRepository.delete({ trackId: id });
+    if (!affected) {
       throw new NotFoundException();
     }
-
-    const data = await this.trackRepository.findOneBy({ id });
-
-    if (!data) {
-      throw new NotFoundException();
-    }
-
-    await this.trackRepository.delete(data);
-    return data;
+    return;
   }
 }

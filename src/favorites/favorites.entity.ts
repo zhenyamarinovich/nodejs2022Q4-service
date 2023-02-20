@@ -1,47 +1,50 @@
-import { Entity, JoinColumn, ManyToOne, Column } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import {
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  Column,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 import { Album } from 'src/albums/album.entity';
 import { Artist } from 'src/artists/artist.entity';
 import { Track } from 'src/tracks/track.entity';
 
-@Entity('FavotitesArtist')
+@Entity('favorites_artist')
 export class FavotitesArtist {
-  constructor(artist: Artist) {
-    this.artist = artist;
-  }
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ name: 'artistId', type: 'uuid', primary: true, unique: true })
-  @Exclude()
-  id: string;
+  @Column({ name: 'artist_id', type: 'uuid' })
+  artistId: string | null;
 
-  @ManyToOne(() => Artist, null, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Artist, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'artist_id', referencedColumnName: 'id' })
   artist: Artist;
 }
 
-@Entity('FavotitesAlbum')
+@Entity('favorites_album')
 export class FavotitesAlbum {
-  constructor(album: Album) {
-    this.album = album;
-  }
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column({ name: 'albumId', type: 'uuid', primary: true, unique: true })
-  @Exclude()
-  id: string;
+  @Column({ name: 'album_id', type: 'uuid' })
+  albumId: string | null;
 
-  @ManyToOne(() => Album, null, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Album, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'album_id', referencedColumnName: 'id' })
   album: Album;
 }
 
-@Entity('FavotitesTrack')
+@Entity('favorites_track')
 export class FavotitesTrack {
-  constructor(track: Track) {
-    this.track = track;
-  }
-  @Column({ name: 'trackId', type: 'uuid', primary: true, unique: true })
-  @Exclude()
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @ManyToOne(() => Track, null, { onDelete: 'CASCADE' })
+  @Column({ name: 'track_id', type: 'uuid' })
+  trackId: string | null;
+
+  @ManyToOne(() => Track, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'track_id', referencedColumnName: 'id' })
   track: Track;
 }

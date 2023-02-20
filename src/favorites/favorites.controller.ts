@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
+
 import { FavoritesService } from './favorites.service';
 
 @Controller('favs')
@@ -23,7 +24,7 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe())
     id: string,
   ) {
-    return this.favoritesService.createTrack(id);
+    return await this.favoritesService.createTrack(id);
   }
 
   @Post('artist/:id')
@@ -31,7 +32,7 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe())
     id: string,
   ) {
-    return this.favoritesService.createArtist(id);
+    return await this.favoritesService.createArtist(id);
   }
 
   @Post('album/:id')
@@ -39,7 +40,7 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe())
     id: string,
   ) {
-    return this.favoritesService.createAlbum(id);
+    return await this.favoritesService.createAlbum(id);
   }
 
   @Delete('artist/:id')
@@ -48,7 +49,7 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe())
     id: string,
   ) {
-    return this.favoritesService.removeArtist(id);
+    return await this.favoritesService.removeArtist(id);
   }
 
   @Delete('album/:id')
@@ -57,7 +58,7 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe())
     id: string,
   ) {
-    return this.favoritesService.removeAlbum(id);
+    return await this.favoritesService.removeAlbum(id);
   }
 
   @Delete('track/:id')
@@ -66,6 +67,6 @@ export class FavoritesController {
     @Param('id', new ParseUUIDPipe())
     id: string,
   ) {
-    return this.favoritesService.removeTrack(id);
+    return await this.favoritesService.removeTrack(id);
   }
 }

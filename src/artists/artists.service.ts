@@ -10,49 +10,46 @@ import { Artist } from './artist.entity';
 export class ArtistsService {
   constructor(
     @InjectRepository(Artist)
-    private readonly artirstRepository: Repository<Artist>,
+    private readonly artistRepository: Repository<Artist>,
   ) {}
 
   async getAll(): Promise<Artist[]> {
-    return this.artirstRepository.find();
+    return this.artistRepository.find();
   }
 
-  async getById(id, flag?) {
-    const artist = await this.artirstRepository.findOneBy({ id });
-
-    if (artist || flag) {
-      return artist;
+  async getById(id) {
+    const artist = await this.artistRepository.findOneBy({ id });
+    if (!artist) {
+      throw new NotFoundException();
     }
-
-    throw new NotFoundException();
-  }
-
-  async create(artistDTO: CreateArtistDTO) {
-    const artist = new Artist(artistDTO.name, artistDTO.grammy);
-
-    await this.artirstRepository.insert(artist);
-
     return artist;
   }
 
-  async update(id, artistDTO: UpdateArtistDTO) {
-    const artist = await this.artirstRepository.findOneBy({ id });
+  async create(artistDTO: CreateArtistDTO) {
+    const newArtist = this.artistRepository.create(artistDTO);
+    return await this.artistRepository.save(newArtist);
+  }
 
-    if (!artist) {
+  async update(id, artistDTO: UpdateArtistDTO) {
+    const entity = await this.artistRepository.findOneBy({ id });
+    if (!entity) {
       throw new NotFoundException();
     }
-
-    await this.artirstRepository.update(id, { ...artistDTO });
-
-    return await this.artirstRepository.findOneBy({ id });
+    for (const key in artistDTO) {
+      if (Object.prototype.hasOwnProperty.call(artistDTO, key)) {
+        const element = artistDTO[key];
+        entity[key] = element;
+      }
+    }
+    await this.artistRepository.update({ id }, artistDTO);
+    return entity;
   }
 
   async remove(id) {
-    const artist = await this.artirstRepository.findOneBy({ id });
-    if (!artist) {
+    const { affected } = await this.artistRepository.delete(id);
+    if (!affected) {
       throw new NotFoundException();
     }
-
-    await this.artirstRepository.delete(id);
+    return;
   }
 }
