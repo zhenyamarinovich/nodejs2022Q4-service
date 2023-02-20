@@ -60,6 +60,6 @@ export class UsersService {
       throw new NotFoundException();
     }
 
-    await this.userRepository.delete(user.id);
+    await this.userRepository.delete(id);
   }
 }
