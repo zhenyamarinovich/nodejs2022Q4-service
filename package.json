@@ -21,7 +21,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "typeorm": "npm run build &&  npx typeorm -d ./dist/ormconfig.js",
     "migrations:generate": "npm run typeorm migration:generate",
-    "migrations:run": "npm run typeorm -- migration:run"
+    "migrations:run": "npm run typeorm -- migration:run",
+    "docker:scan": "docker scan avshell/node2022q4 && docker scan avshell/postgres2022q4 "
   },
   "dependencies": {
     "@nestjs/common": "^8.0.0",

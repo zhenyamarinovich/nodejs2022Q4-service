@@ -31,8 +31,8 @@ export class TracksService {
 
   async create(trackDTO: CreateTrackDTO) {
     try {
-      const newTrack = await this.trackRepository.create(trackDTO);
-      return await this.trackRepository.save(newTrack);
+      const track = await this.trackRepository.create(trackDTO);
+      return await this.trackRepository.save(track);
     } catch (error) {
       throw new NotFoundException();
     }
