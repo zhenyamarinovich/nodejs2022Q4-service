@@ -1,7 +1,23 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Expose, Transform } from 'class-transformer';
+
+import { Artist } from 'src/artists/artist.entity';
+import { Album } from 'src/albums/album.entity';
 
 @Entity()
 export class Track {
+  constructor(
+    name: string,
+    duration: number,
+    artist: Artist | null,
+    album: Album | null,
+  ) {
+    this.name = name;
+    this.duration = duration;
+    this.artist = artist;
+    this.album = album;
+  }
+
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
@@ -11,21 +27,13 @@ export class Track {
   @Column()
   duration: number;
 
-  @Column({ nullable: true })
-  artistId: string | null;
+  @ManyToOne(() => Artist, null, { onDelete: 'SET NULL', eager: true })
+  @Expose({ name: 'artistId' })
+  @Transform(({ value }) => (value ? value.id : null))
+  artist: Artist | null;
 
-  @Column({ nullable: true })
-  albumId: string | null;
-
-  constructor(
-    name: string,
-    artistId: string | null,
-    albumId: string | null,
-    duration: number,
-  ) {
-    this.name = name;
-    this.artistId = artistId;
-    this.albumId = albumId;
-    this.duration = duration;
-  }
+  @ManyToOne(() => Album, null, { onDelete: 'SET NULL', eager: true })
+  @Expose({ name: 'albumId' })
+  @Transform(({ value }) => (value ? value.id : null))
+  album: Album | null;
 }

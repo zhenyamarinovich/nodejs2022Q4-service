@@ -17,10 +17,10 @@ export class ArtistsService {
     return this.artirstRepository.find();
   }
 
-  async getById(id) {
+  async getById(id, flag?) {
     const artist = await this.artirstRepository.findOneBy({ id });
 
-    if (artist) {
+    if (artist || flag) {
       return artist;
     }
 
