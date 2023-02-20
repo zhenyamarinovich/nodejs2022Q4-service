@@ -26,23 +26,19 @@ export class ArtistsService {
   }
 
   async create(artistDTO: CreateArtistDTO) {
-    const newArtist = this.artistRepository.create(artistDTO);
-    return await this.artistRepository.save(newArtist);
+    const artist = this.artistRepository.create(artistDTO);
+    return await this.artistRepository.save(artist);
   }
 
   async update(id, artistDTO: UpdateArtistDTO) {
-    const entity = await this.artistRepository.findOneBy({ id });
-    if (!entity) {
+    const artist = await this.artistRepository.findOneBy({ id });
+
+    if (!artist) {
       throw new NotFoundException();
     }
-    for (const key in artistDTO) {
-      if (Object.prototype.hasOwnProperty.call(artistDTO, key)) {
-        const element = artistDTO[key];
-        entity[key] = element;
-      }
-    }
+
     await this.artistRepository.update({ id }, artistDTO);
-    return entity;
+    return await this.artistRepository.findOneBy({ id });
   }
 
   async remove(id) {

@@ -39,22 +39,18 @@ export class TracksService {
   }
 
   async update(id, trackDTO: UpdateTrackDTO) {
-    const entity = await this.trackRepository.findOneBy({ id });
-    if (!entity) {
+    const track = await this.trackRepository.findOneBy({ id });
+
+    if (!track) {
       throw new NotFoundException();
     }
-    for (const key in trackDTO) {
-      if (Object.prototype.hasOwnProperty.call(trackDTO, key)) {
-        const element = trackDTO[key];
-        entity[key] = element;
-      }
-    }
+
     try {
       await this.trackRepository.update({ id }, trackDTO);
     } catch (error) {
       throw new NotFoundException();
     }
-    return entity;
+    return await this.trackRepository.findOneBy({ id });
   }
 
   async remove(id) {

@@ -47,7 +47,6 @@ export class FavoritesService {
   async createTrack(id: string) {
     const track = await this.trackRepository.create({ trackId: id });
 
-    console.log(track);
     try {
       return await this.trackRepository.save(track);
     } catch (error) {

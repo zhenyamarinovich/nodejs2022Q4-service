@@ -31,31 +31,25 @@ export class AlbumsService {
 
   async create(albumDTO: CreateAlbumDTO) {
     try {
-      const newAlbum = this.albumRepository.create(albumDTO);
-      return await this.albumRepository.save(newAlbum);
+      const album = this.albumRepository.create(albumDTO);
+      return await this.albumRepository.save(album);
     } catch (error) {
       throw new NotFoundException();
     }
   }
 
   async update(id, albumDTO: UpdateAlbumDTO) {
-    const entity = await this.albumRepository.findOneBy({ id });
-    if (!entity) {
+    const album = await this.albumRepository.findOneBy({ id });
+    if (!album) {
       throw new NotFoundException();
     }
 
-    for (const key in albumDTO) {
-      if (Object.prototype.hasOwnProperty.call(albumDTO, key)) {
-        const element = albumDTO[key];
-        entity[key] = element;
-      }
-    }
     try {
       await this.albumRepository.update({ id }, albumDTO);
     } catch (error) {
       throw new NotFoundException();
     }
-    return entity;
+    return await this.albumRepository.findOneBy({ id });
   }
 
   async remove(id) {
