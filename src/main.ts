@@ -5,11 +5,7 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { parse } from 'yaml';
 
-import * as dotenv from 'dotenv';
-
 import { AppModule } from './app.module';
-
-dotenv.config();
 
 const PORT = process.env.PORT || 4000;
 

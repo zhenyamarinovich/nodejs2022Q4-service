@@ -1,73 +1,51 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { v4 } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-import { DatabaseService } from 'src/database/database.service';
 import { CreateArtistDTO } from './dto/create-artist.dto';
 import { UpdateArtistDTO } from './dto/update-artist.dto';
+import { Artist } from './artist.entity';
 
 @Injectable()
 export class ArtistsService {
-  constructor(private database: DatabaseService) {}
+  constructor(
+    @InjectRepository(Artist)
+    private readonly artistRepository: Repository<Artist>,
+  ) {}
 
-  getAll() {
-    return this.database.artists;
+  async getAll(): Promise<Artist[]> {
+    return this.artistRepository.find();
   }
 
-  getById(id) {
-    const artist = this.database.artists.find((artist) => artist.id === id);
-    if (artist) {
-      return artist;
+  async getById(id) {
+    const artist = await this.artistRepository.findOneBy({ id });
+    if (!artist) {
+      throw new NotFoundException();
     }
-
-    throw new NotFoundException();
-  }
-
-  create(artistDTO: CreateArtistDTO) {
-    const artist = {
-      ...artistDTO,
-      id: v4(),
-    };
-
-    this.database.artists.push(artist);
-
     return artist;
   }
 
-  update(id, artistDTO: UpdateArtistDTO) {
-    const index = this.database.artists.findIndex((artist) => artist.id === id);
-
-    if (index === -1) {
-      throw new NotFoundException();
-    }
-
-    this.database.artists[index] = {
-      ...this.database.artists[index],
-      ...artistDTO,
-    };
-
-    return this.database.artists[index];
+  async create(artistDTO: CreateArtistDTO) {
+    const artist = this.artistRepository.create(artistDTO);
+    return await this.artistRepository.save(artist);
   }
 
-  remove(id) {
-    const index = this.database.artists.findIndex((artist) => artist.id === id);
+  async update(id, artistDTO: UpdateArtistDTO) {
+    const artist = await this.artistRepository.findOneBy({ id });
 
-    if (index === -1) {
+    if (!artist) {
       throw new NotFoundException();
     }
 
-    const indexInFavorites = this.database.favorites.artists.indexOf(id);
-    if (index !== -1) {
-      this.database.favorites.artists.splice(indexInFavorites, 1);
+    await this.artistRepository.update({ id }, artistDTO);
+    return await this.artistRepository.findOneBy({ id });
+  }
+
+  async remove(id) {
+    const { affected } = await this.artistRepository.delete(id);
+    if (!affected) {
+      throw new NotFoundException();
     }
-
-    this.database.tracks
-      .filter((track) => track.artistId === id)
-      .forEach((track) => (track.artistId = null));
-
-    this.database.albums
-      .filter((album) => album.artistId === id)
-      .forEach((album) => (album.artistId = null));
-
-    this.database.artists.splice(index, 1);
+    return;
   }
 }

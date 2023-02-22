@@ -3,11 +3,11 @@ import {
   Delete,
   Get,
   HttpCode,
-  HttpStatus,
   Param,
   ParseUUIDPipe,
   Post,
 } from '@nestjs/common';
+
 import { FavoritesService } from './favorites.service';
 
 @Controller('favs')
@@ -20,35 +20,53 @@ export class FavoritesController {
   }
 
   @Post('track/:id')
-  createTrack(@Param('id', new ParseUUIDPipe()) id) {
-    return this.favoritesService.createTrack(id);
-  }
-
-  @Post('album/:id')
-  createAlbum(@Param('id', new ParseUUIDPipe()) id) {
-    return this.favoritesService.createAlbum(id);
+  async createTrack(
+    @Param('id', new ParseUUIDPipe())
+    id: string,
+  ) {
+    return await this.favoritesService.createTrack(id);
   }
 
   @Post('artist/:id')
-  createArtist(@Param('id', new ParseUUIDPipe()) id) {
-    return this.favoritesService.createArtist(id);
+  async createArtist(
+    @Param('id', new ParseUUIDPipe())
+    id: string,
+  ) {
+    return await this.favoritesService.createArtist(id);
   }
 
-  @Delete('track/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  removeTrack(@Param('id', new ParseUUIDPipe()) id) {
-    return this.favoritesService.removeTrack(id);
-  }
-
-  @Delete('album/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  removeAlbum(@Param('id', new ParseUUIDPipe()) id) {
-    return this.favoritesService.removeAlbum(id);
+  @Post('album/:id')
+  async createAlbum(
+    @Param('id', new ParseUUIDPipe())
+    id: string,
+  ) {
+    return await this.favoritesService.createAlbum(id);
   }
 
   @Delete('artist/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  removeArtist(@Param('id', new ParseUUIDPipe()) id) {
-    return this.favoritesService.removeArtist(id);
+  @HttpCode(204)
+  async removeArtist(
+    @Param('id', new ParseUUIDPipe())
+    id: string,
+  ) {
+    return await this.favoritesService.removeArtist(id);
+  }
+
+  @Delete('album/:id')
+  @HttpCode(204)
+  async removeAlbum(
+    @Param('id', new ParseUUIDPipe())
+    id: string,
+  ) {
+    return await this.favoritesService.removeAlbum(id);
+  }
+
+  @Delete('track/:id')
+  @HttpCode(204)
+  async removeTrack(
+    @Param('id', new ParseUUIDPipe())
+    id: string,
+  ) {
+    return await this.favoritesService.removeTrack(id);
   }
 }
