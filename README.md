@@ -16,6 +16,12 @@ git clone {repository URL}
 ```
 npm install
 ```
+## Running docker
+
+```
+ docker-compose build 
+ docker-compose up
+```
 
 ## Running application
 
@@ -63,6 +69,17 @@ npm run lint
 
 ```
 npm run format
+```
+## Running migration
+
+```
+npm run migration:generate
+```
+
+## Running script for vulnerabilities scanning
+
+```
+npm run docker:scan
 ```
 
 ### Debugging in VSCode
