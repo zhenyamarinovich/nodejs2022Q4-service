@@ -6,7 +6,9 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 import { FavoritesService } from './favorites.service';
 
@@ -14,11 +16,13 @@ import { FavoritesService } from './favorites.service';
 export class FavoritesController {
   constructor(private favoritesService: FavoritesService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   getAll() {
     return this.favoritesService.getAll();
   }
 
+  @UseGuards(AuthGuard)
   @Post('track/:id')
   async createTrack(
     @Param('id', new ParseUUIDPipe())
@@ -27,6 +31,7 @@ export class FavoritesController {
     return await this.favoritesService.createTrack(id);
   }
 
+  @UseGuards(AuthGuard)
   @Post('artist/:id')
   async createArtist(
     @Param('id', new ParseUUIDPipe())
@@ -35,6 +40,7 @@ export class FavoritesController {
     return await this.favoritesService.createArtist(id);
   }
 
+  @UseGuards(AuthGuard)
   @Post('album/:id')
   async createAlbum(
     @Param('id', new ParseUUIDPipe())
@@ -43,6 +49,7 @@ export class FavoritesController {
     return await this.favoritesService.createAlbum(id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('artist/:id')
   @HttpCode(204)
   async removeArtist(
@@ -52,6 +59,7 @@ export class FavoritesController {
     return await this.favoritesService.removeArtist(id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('album/:id')
   @HttpCode(204)
   async removeAlbum(
@@ -61,6 +69,7 @@ export class FavoritesController {
     return await this.favoritesService.removeAlbum(id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('track/:id')
   @HttpCode(204)
   async removeTrack(

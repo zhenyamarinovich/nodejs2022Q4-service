@@ -6,9 +6,10 @@ import { AlbumsController } from './albums.controller';
 import { AlbumsService } from './albums.service';
 
 import { Artist } from 'src/artists/artist.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Album, Artist])],
+  imports: [TypeOrmModule.forFeature([Album, Artist]), AuthModule],
   controllers: [AlbumsController],
   providers: [AlbumsService],
 })
