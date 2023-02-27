@@ -43,21 +43,6 @@ export class LoggingService implements LoggerInterface {
     this.writeLog('warn', message);
   }
 
-  logResponse(
-    statusCode: number,
-    responseBody: string | object | undefined,
-  ): any {
-    let responseBodyString = 'N/A';
-
-    if (typeof responseBody === 'string') {
-      responseBodyString = responseBody;
-    } else if (typeof responseBody === 'object') {
-      responseBodyString = JSON.stringify(responseBody);
-    }
-
-    this.log(`Response: Status code ${statusCode}; Body ${responseBodyString}`);
-  }
-
   private writeToFile(level: LogLevel, formatLine: string) {
     const fileName = level === 'error' ? FILE_LOG_ERROR_NAME : FILE_LOG_NAME;
     const filePath = join(PATH, fileName);
