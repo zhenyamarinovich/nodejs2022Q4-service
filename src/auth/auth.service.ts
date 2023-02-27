@@ -1,13 +1,10 @@
-import {
-  Injectable,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
 import { CreateUserDTO } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
+import { RefreshTokenDTO } from './dto/refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -31,15 +28,10 @@ export class AuthService {
     if (!isRightPassword) {
       throw new ForbiddenException();
     }
-    return this.generateToken(user);
+    return this.generateToken({ login: user.login, userId: user.id });
   }
 
   async registration(userDTO: CreateUserDTO) {
-    const userByEmail = await this.userService.getUserByLogin(userDTO.login);
-    if (userByEmail) {
-      throw new BadRequestException('User with the same login is exist');
-    }
-
     const hashPassword = await bcrypt.hash(
       userDTO.password,
       Number(process.env.CRYPT_SALT),
@@ -50,13 +42,37 @@ export class AuthService {
       password: hashPassword,
     });
 
-    return this.generateToken(user);
+    return user;
   }
 
-  async generateToken(user) {
-    const payload = { userId: user.id, login: user.login };
+  async refresh({ refreshToken }: RefreshTokenDTO) {
+    try {
+      const tokenData = this.jwtService.verify(refreshToken);
+
+      const user = this.userService.getById(tokenData.userId);
+
+      if (!user) {
+        throw new ForbiddenException();
+      }
+
+      return this.generateToken({
+        userId: tokenData.id,
+        login: tokenData.login,
+      });
+    } catch (e) {
+      throw new ForbiddenException(e.message);
+    }
+  }
+
+  async generateToken(payload) {
     return {
-      token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload, {
+        expiresIn: process.env.TOKEN_EXPIRE_TIME || '1h',
+      }),
+      refreshToken: this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET_REFRESH_KEY,
+        expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME || '24h',
+      }),
     };
   }
 }
