@@ -63,4 +63,9 @@ export class UsersService {
 
     await this.userRepository.delete(id);
   }
+
+  async getUserByLogin(login) {
+    const user = await this.userRepository.findOneBy({ login });
+    return user;
+  }
 }

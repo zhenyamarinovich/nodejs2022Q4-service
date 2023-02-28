@@ -5,3 +5,4 @@ Dockerfile
 docker
 HomeLibrary1PostmanCollection.json
 volumes
+logs

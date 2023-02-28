@@ -9,10 +9,12 @@ import {
   FavotitesArtist,
   FavotitesTrack,
 } from './favorites.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([FavotitesAlbum, FavotitesTrack, FavotitesArtist]),
+    AuthModule,
   ],
   controllers: [FavoritesController],
   providers: [FavoritesService],

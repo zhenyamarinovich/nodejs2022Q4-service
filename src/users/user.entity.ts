@@ -14,7 +14,7 @@ export class User {
   readonly id: string;
 
   @Column()
-  private login: string;
+  login: string;
 
   @VersionColumn()
   private version: number;

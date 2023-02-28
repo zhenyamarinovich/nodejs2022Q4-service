@@ -9,7 +9,9 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 import { ArtistsService } from './artists.service';
 import { CreateArtistDTO } from './dto/create-artist.dto';
@@ -19,21 +21,25 @@ import { UpdateArtistDTO } from './dto/update-artist.dto';
 export class ArtistsController {
   constructor(private artistsService: ArtistsService) {}
 
+  @UseGuards(AuthGuard)
   @Get()
   getAll() {
     return this.artistsService.getAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   getById(@Param('id', new ParseUUIDPipe()) id) {
     return this.artistsService.getById(id);
   }
 
+  @UseGuards(AuthGuard)
   @Post()
   create(@Body() createArtistDTO: CreateArtistDTO) {
     return this.artistsService.create(createArtistDTO);
   }
 
+  @UseGuards(AuthGuard)
   @Put(':id')
   update(
     @Param('id', new ParseUUIDPipe()) id,
@@ -42,6 +48,7 @@ export class ArtistsController {
     return this.artistsService.update(id, updateArtistDTO);
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', new ParseUUIDPipe()) id) {
